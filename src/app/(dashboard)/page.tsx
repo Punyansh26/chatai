@@ -11,10 +11,10 @@ const Page = async () => {
     );
     if (!session) {
         redirect("/sign-in")
-        
+
     }
     return (
-        <HomeViwe />
+        <HomeViwe/>
     )
 }
 export default Page;
