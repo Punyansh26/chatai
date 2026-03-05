@@ -1,6 +1,6 @@
 
-import { SignInViews } from "@/modules/auth/ui/views/sign-in-views";
 
+import { SignInViews } from "@/modules/auth/ui/views/sign-in-views";
 
 const Page = () => {
     console.log("Sign In Page");
