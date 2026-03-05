@@ -6,7 +6,6 @@ import { Field, FieldDescription, FieldGroup, FieldLabel, FieldSeparator } from 
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 
-import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import { z } from "zod"
@@ -18,6 +17,7 @@ import { useForm } from "react-hook-form"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { link } from "fs";
 import { auth } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 
 
@@ -47,6 +47,7 @@ const formSchema = z.object({
 });
 
 export const SignUpViews = () => {
+        
     console.log("Sign Up Views");
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -57,7 +58,7 @@ export const SignUpViews = () => {
             confirmPassword: "",
         },
     });
-    const router = useRouter();
+
     const [error, seterror] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
 
@@ -69,11 +70,12 @@ export const SignUpViews = () => {
             name: data.name,
             email: data.email,
             password: data.password,
+            callbackURL: "/",
         },
             {
                 onSuccess: () => {
                     setLoading(false);
-                    router.push("/dashboard");
+                    router.push("/");
                 },
                 onError: ({ error }) => {
                     setLoading(false);
@@ -89,7 +91,7 @@ export const SignUpViews = () => {
 
         authClient.signIn.social({
             provider,
-            callbackURL: "/dashboard",
+            callbackURL: "/",
         });
     }
 

@@ -1,9 +1,25 @@
 
 
+import { auth } from "@/lib/auth";
 import { SignInViews } from "@/modules/auth/ui/views/sign-in-views";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 
-const Page = () => {
+const Page = async () => {
+
+
     console.log("Sign In Page");
+
+    const session = await auth.api.getSession(
+        {
+            headers: await headers(),
+        }
+    );
+    if (!!session) {
+        redirect("/")
+
+    }
+
     return (
         <SignInViews />
     );
