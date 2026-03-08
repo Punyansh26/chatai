@@ -1,4 +1,4 @@
-import { HomeViwe } from "@/modules/home/ui/views/home-view";
+import { HomeView } from "@/modules/home/ui/views/home-view";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
@@ -14,7 +14,7 @@ const Page = async () => {
 
     }
     return (
-        <HomeViwe/>
+        <HomeView/>
     )
 }
 export default Page;
