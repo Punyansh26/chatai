@@ -77,7 +77,7 @@ export function DataTable<TData, TValue>({
                         <TableRow
                             key={row.id}
                             data-state={row.getIsSelected() && "selected"}
-                            className="group border-border/30 transition-colors duration-200 hover:bg-muted/50 data-[state=selected]:bg-primary/5"
+                            className="group border-b border-border/60 bg-background/50 transition-colors duration-200 hover:bg-muted/50 data-[state=selected]:bg-primary/5"
                             style={{
                                 animationDelay: `${index * 50}ms`,
                             }}
