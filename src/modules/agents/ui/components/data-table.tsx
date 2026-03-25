@@ -16,6 +16,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import { EmptyState } from "@/components/empty-state"
+import { cn } from "@/lib/utils"
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -36,7 +37,7 @@ export function DataTable<TData, TValue>({
 
     if (data.length === 0) {
         return (
-            <div className="rounded-xl border border-border/50 bg-gradient-to-b from-background to-muted/20">
+            <div className="rounded-xl border border-border bg-card shadow-sm">
                 <EmptyState
                     title="No agents yet"
                     description="Create your first AI agent to get started. Agents can help automate tasks and enhance your workflow."
@@ -48,18 +49,18 @@ export function DataTable<TData, TValue>({
     }
 
     return (
-        <div className="overflow-hidden rounded-xl border border-border/50 bg-gradient-to-b from-background to-muted/10 shadow-sm">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow
                             key={headerGroup.id}
-                            className="border-border/50 bg-muted/30 hover:bg-muted/30"
+                            className="border-b border-border bg-muted hover:bg-muted"
                         >
                             {headerGroup.headers.map((header) => (
                                 <TableHead
                                     key={header.id}
-                                    className="text-xs font-semibold uppercase tracking-wider text-muted-foreground/70"
+                                    className="text-xs font-semibold uppercase tracking-wider text-foreground/70"
                                 >
                                     {header.isPlaceholder
                                         ? null
@@ -77,7 +78,11 @@ export function DataTable<TData, TValue>({
                         <TableRow
                             key={row.id}
                             data-state={row.getIsSelected() && "selected"}
-                            className="group border-border/30 transition-colors duration-200 hover:bg-muted/50 data-[state=selected]:bg-primary/5"
+                            className={cn(
+                                "border-b border-border transition-colors duration-200",
+                                "hover:bg-muted/60 data-[state=selected]:bg-primary/5",
+                                index % 2 === 0 ? "bg-card" : "bg-muted/20"
+                            )}
                             style={{
                                 animationDelay: `${index * 50}ms`,
                             }}
