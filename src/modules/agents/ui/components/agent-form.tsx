@@ -1,6 +1,6 @@
+"use client";
 
 import { useTRPC } from "@/trpc/client";
-import { useRouter } from "next/navigation";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 import { AgentGetOne } from "../../types";
@@ -20,101 +20,141 @@ import {
 import { GeneratedAvatar } from "@/components/generated-avatar";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button"
-import { on } from "events";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-
-
+import { BotIcon, WandIcon, SparklesIcon, Loader2Icon } from "lucide-react";
 
 interface AgentFormProps {
     onSuccess?: () => void;
     onCancel?: () => void;
     initialValues?: AgentGetOne;
-};
+}
 
 export const AgentForm = ({ onSuccess, onCancel, initialValues }: AgentFormProps) => {
     const trpc = useTRPC();
-    const router = useRouter();
     const queryClient = useQueryClient();
     const createAgent = useMutation(
         trpc.agent.create.mutationOptions({
-            onSuccess: async() => { 
-                queryClient.invalidateQueries(trpc.agent.getMany.queryOptions());
-                if(initialValues?.id) {
+            onSuccess: async () => {
+                await queryClient.invalidateQueries(trpc.agent.getMany.queryOptions());
+                if (initialValues?.id) {
                     await queryClient.invalidateQueries(trpc.agent.getOne.queryOptions({ id: initialValues.id }));
                 }
                 onSuccess?.();
             },
             onError: (error) => {
                 toast.error(error.message || "Something went wrong while creating the agent. Please try again.");
-                //Todo forbidden then upgrade plan message
             },
         }),
     );
+
     const form = useForm<z.infer<typeof agentInsertSchema>>({
         resolver: zodResolver(agentInsertSchema),
         defaultValues: {
-            name: initialValues?.name || '',
-            instructions: initialValues?.instructions || '',
+            name: initialValues?.name || "",
+            instructions: initialValues?.instructions || "",
         },
     });
+
     const isEdit = !!initialValues?.id;
     const isPending = createAgent.isPending;
+
     const onSubmit = (values: z.infer<typeof agentInsertSchema>) => {
         if (isEdit) {
-            console.log('TODO:Update agent procedure and logic')   //Todo implement update agent procedure and logic
+            console.log("TODO:Update agent procedure and logic");
         } else {
             createAgent.mutate(values);
         }
     };
+
     return (
         <Form {...form}>
-
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-                <GeneratedAvatar seed={form.watch("name")} className="w-24 h-24 rounded-full mx-auto" />
+                <div className="flex justify-center">
+                    <div className="relative group">
+                        <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-primary/50 via-primary/30 to-primary/50 blur-md opacity-60 group-hover:opacity-80 transition-opacity duration-300" />
+                        <GeneratedAvatar
+                            seed={form.watch("name")}
+                            className="relative size-20 rounded-full ring-2 ring-primary/20 group-hover:ring-primary/40 transition-all duration-300"
+                        />
+                    </div>
+                </div>
+
                 <FormField
                     control={form.control}
                     name="name"
                     render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Agent Name</FormLabel>
+                        <FormItem className="space-y-2">
+                            <FormLabel className="text-sm font-medium flex items-center gap-2">
+                                <BotIcon className="size-3.5 text-primary" />
+                                Agent Name
+                            </FormLabel>
                             <FormControl>
-                                <Input placeholder="Agent Name" {...field} />
+                                <Input
+                                    placeholder="e.g., Research Assistant"
+                                    className="h-11 bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-all duration-200 input-glow"
+                                    {...field}
+                                />
                             </FormControl>
-                            <FormMessage /> {/* Display validation error message for name field */}
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
+
                 <FormField
                     control={form.control}
                     name="instructions"
                     render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Agent Instructions</FormLabel>
+                        <FormItem className="space-y-2">
+                            <FormLabel className="text-sm font-medium flex items-center gap-2">
+                                <WandIcon className="size-3.5 text-primary" />
+                                Instructions
+                            </FormLabel>
                             <FormControl>
-                                <Textarea placeholder="Agent Instructions" {...field} />
+                                <Textarea
+                                    placeholder="Describe how this agent should behave, what it specializes in, and its personality..."
+                                    rows={4}
+                                    className="resize-none bg-background/50 border-border/50 focus:border-primary/50 focus:ring-primary/20 transition-all duration-200 input-glow"
+                                    {...field}
+                                />
                             </FormControl>
-                            <FormMessage /> {/* Display validation error message for instructions field */}
+                            <p className="text-xs text-muted-foreground/70">
+                                Be specific about the agent&apos;s role and expertise
+                            </p>
+                            <FormMessage />
                         </FormItem>
                     )}
                 />
-                <div className="flex justify-between gap-2">
+
+                <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
                     {onCancel && (
                         <Button
                             type="button"
-                            variant="ghost"
+                            variant="outline"
                             disabled={isPending}
                             onClick={onCancel}
+                            className="border-border/50 hover:bg-muted/50"
                         >
                             Cancel
                         </Button>
                     )}
-                    <Button disabled={isPending} className="ml-2" type="submit">
-                        {isEdit ? 'Update' : 'Create'} Agent
+                    <Button
+                        type="submit"
+                        disabled={isPending}
+                        className="group relative overflow-hidden bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20 transition-all duration-300 hover:shadow-xl hover:shadow-primary/30"
+                    >
+                        <span className="absolute inset-0 bg-gradient-to-r from-primary via-primary/80 to-primary opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                        <span className="relative flex items-center gap-2">
+                            {isPending ? (
+                                <Loader2Icon className="size-4 animate-spin" />
+                            ) : (
+                                <SparklesIcon className="size-4" />
+                            )}
+                            {isPending ? (isEdit ? "Updating..." : "Creating...") : (isEdit ? "Update Agent" : "Create Agent")}
+                        </span>
                     </Button>
                 </div>
             </form>
         </Form>
     );
-}
+};
